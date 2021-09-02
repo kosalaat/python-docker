@@ -1,0 +1,30 @@
+name: Build the python docker
+
+on: [ push ]
+
+jobs:
+  create_pex:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      - name: Ensure python
+        run: sudo apt update && apt -y install python3 python3-pip
+      - name: Create the pex wrapper
+        run: pip install 'pex>=2.1.0' --upgrade && pex -r requirements.txt -o pexwrap
+      - name: Upload artifact
+        uses: actions/upload-aritifact@v2
+        with: 
+          name: pexarchive
+          path: pexwrap
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+      - name: download the artifact
+        uses: actions/download-artifact@v2
+      - name: build the docker 
+        run: docker build . -f Dockerfile.simple-pex
+  
+      
