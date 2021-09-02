@@ -1,0 +1,30 @@
+FROM python:alpine as build
+
+RUN apk upgrade --no-cache 
+
+RUN apk add --no-cache tini gcc musl-dev python3-dev libffi-dev openssl-dev cargo busybox-suid
+
+WORKDIR /source 
+
+RUN python -m venv /source/venv 
+
+RUN . /source/venv/bin/activate && \
+	 python -m ensurepip --upgrade && \
+	 python -m pip install pex~=2.1.47 && \
+	pex simple_salesforce -o /source/pex_wrapper
+
+# Build the final image
+FROM python:alpine as final
+
+RUN apk upgrade --no-cache 
+
+RUN adduser -S python --uid 1000 && addgroup -S python --gid 1000
+
+WORKDIR /source 
+
+RUN chown python:python /source
+
+USER python:python
+
+COPY --from=build --chown=python:python  /source/pex_wrapper /source
+
