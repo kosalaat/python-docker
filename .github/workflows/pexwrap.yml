@@ -13,7 +13,7 @@ jobs:
       - name: Create the pex wrapper
         run: pip install 'pex>=2.1.0' --upgrade && pex -r requirements.txt -o pexwrap
       - name: Upload artifact
-        uses: actions/upload-aritifact@v2
+        uses: actions/upload-aritifacts@v2
         with: 
           name: pexarchive
           path: pexwrap
@@ -24,7 +24,10 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@v2
       - name: download the artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifacts@v2
+        with: 
+          name: pexarchive
+          path: pexwrap
       - name: build the docker 
         run: docker build . -f Dockerfile.simple-pex
   
