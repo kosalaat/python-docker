@@ -19,6 +19,7 @@ jobs:
           path: pexwrap
   build-image:
     runs-on: ubuntu-latest
+    needs: create_pex
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
